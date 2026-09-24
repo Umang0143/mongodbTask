@@ -1,17 +1,34 @@
+# Workflow configuration for CI/CD pipeline
 name: CI Pipeline
 
+# Trigger the workflow on push to the 'umang' branch or when manually triggered
 on:
   push:
     branches:
       - umang
 
+  # Allow manual triggering of the workflow
   workflow_dispatch:
 
+# Define environment variables for the workflow
+env:
+  APP_NAME: python-api
+  PYTHON_VERSION: "3.9"
+
+# Define the jobs to be executed in the workflow
 jobs:
+
+  # Define a job named 'build' that runs on an Ubuntu environment
   build:
+
+    # Only run this job if the push is to the 'umang' branch
+    if: ${{ github.ref == 'refs/heads/umang' }}
+
+    # Runner environment for the job
     name: Build and Test
     runs-on: ubuntu-latest
 
+    # Define the steps to be executed in the job
     steps:
 
       - name: Checkout
@@ -20,17 +37,17 @@ jobs:
       - name: Setup Python
         uses: actions/setup-python@v5
         with:
-          python-version: "3.9"
+          python-version: ${{ env.PYTHON_VERSION }}
 
       - name: Install dependencies
         run: pip install -r requirements.txt
 
       - name: Test
-        run: pytest
+        run: test
 
       - name: Docker Build
         uses: docker/build-push-action@v6
         with:
           context: .
           push: false
-          tags: python-api:latest
+          tags: ${{ env.APP_NAME }}:latest
