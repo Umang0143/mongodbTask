@@ -13,20 +13,24 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
+
       - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Setup Node.js
-        uses: actions/setup-node@v4
+      - name: Setup Python
+        uses: actions/setup-python@v5
         with:
-          node-version: 20
-          cache: npm
+          python-version: "3.9"
 
       - name: Install dependencies
-        run: npm ci
-
-      - name: Build
-        run: npm run build
+        run: pip install -r requirements.txt
 
       - name: Test
-        run: npm test
+        run: pytest
+
+      - name: Docker Build
+        uses: docker/build-push-action@v6
+        with:
+          context: .
+          push: false
+          tags: python-api:latest
